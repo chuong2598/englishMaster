@@ -1,0 +1,16 @@
+controller\WordController.class
+model\hadoop\Map.class
+model\word\Word.class
+model\hadoop\Reduce.class
+config\WebAppInitializer.class
+controller\HadoopController.class
+model\word\DifficultWord.class
+model\hadoop\DBInput.class
+config\AppConfig.class
+model\hadoop\DBReducerOutput.class
+Main.class
+model\word\NormalWord.class
+model\hadoop\DBMapperOutput.class
+model\word\EasyWord.class
+service\WordService.class
+service\HadoopService.class

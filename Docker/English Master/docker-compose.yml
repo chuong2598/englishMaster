@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+  hadoop:
+    container_name: hadoop
+    build: ./Hadoop_service/
+    ports:
+      - 8080:8080
+
+  backend:
+    container_name: backend
+    build: ./Back_end/
+    ports:
+      - 9000:9000
+      
+  frontend:
+    container_name: frontend
+    build: ./Front_end/
+    ports:
+      - 80:80
