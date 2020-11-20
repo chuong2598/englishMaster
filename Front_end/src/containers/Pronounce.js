@@ -17,7 +17,7 @@ class Pronounce extends Component {
     }
 
     recognition.onend = function () {
-      if (transcript.toLowerCase().includes(word.toLowerCase())) {
+      if (transcript.includes(word)) {
         document.getElementById("validate-pronouce").innerHTML = `<i class="fa fa-check" aria-hidden="true"></i>Correct pronunciation`
         document.getElementById("validate-pronouce").className = "text-success"
         // alert("CORRECT")

@@ -1,5 +1,5 @@
 import React from 'react';
-// import WordForm from './WordForm.js';
+import WordForm from './WordForm.js';
 import "./Word.css"
 
 
@@ -104,8 +104,8 @@ export default class Word extends React.Component  {
                         </tbody>
                     </table>
                     
-                   {/* <WordForm words = {this.props.words} dispatch = {this.props.dispatch} action = {this.state.action} active = {this.state.active}
-                     editedWord = {this.props.editedWord} wordID_be_deleted = {this.state.wordID_be_deleted}  />  */}
+                   <WordForm words = {this.props.words} dispatch = {this.props.dispatch} action = {this.state.action} active = {this.state.active}
+                     editedWord = {this.props.editedWord} wordID_be_deleted = {this.state.wordID_be_deleted}  /> 
 
                     </div>
                         )

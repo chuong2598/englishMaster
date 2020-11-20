@@ -4,7 +4,7 @@ import Pronounce from "./Pronounce";
 import "./User.css"
 import ReactInterval from 'react-interval';
 
-var lastestIndex = 0
+
 
 export default class User extends React.Component {
 
@@ -15,13 +15,10 @@ export default class User extends React.Component {
             guessing_Word: {}, displayed_hello: false, takingTest: false, answer: "", 
             learnMode: "", minute: 0, second: 0, startTime: ""
         }
-        
     }
 
     componentWillReceiveProps(){
         this.setState({guessing_Word: this.props.words})
-        console.log("Guessing word")
-        console.log(this.state.guessing_Word)
     }
 
 
@@ -48,17 +45,17 @@ export default class User extends React.Component {
 
 
     // ********************
-    // postRecord(user_id, word_id, timeStart, timeEnd, total_minutes) {
-    //     console.log(user_id, word_id, timeStart, timeEnd, total_minutes)
-    //     fetch(`https://www.englishmaster.icu:9000/timerecord`, {
-    //         headers: {
-    //             Accept: "application/json, text/plain, */*",
-    //             "Content-Type": "application/json"
-    //         },
-    //         method: "post",
-    //         body: JSON.stringify({ learner_id: user_id, word_id: word_id, timeStart: timeStart, timeEnd: timeEnd, total_minutes: total_minutes })
-    //     })
-    // }
+    postRecord(user_id, word_id, timeStart, timeEnd, total_minutes) {
+        console.log(user_id, word_id, timeStart, timeEnd, total_minutes)
+        fetch(`https://www.englishmaster.icu:9000/timerecord`, {
+            headers: {
+                Accept: "application/json, text/plain, */*",
+                "Content-Type": "application/json"
+            },
+            method: "post",
+            body: JSON.stringify({ learner_id: user_id, word_id: word_id, timeStart: timeStart, timeEnd: timeEnd, total_minutes: total_minutes })
+        })
+    }
 
 
 
@@ -84,9 +81,8 @@ export default class User extends React.Component {
         if(this.state.answer == this.props.words.vietnamese){
             document.getElementById("loadAnswer").className = "spinner-grow text-warning spinner-grow-sm"
             console.log("Correct answer")
-            // this.postRecord(this.props.userId, this.props.words.id, this.state.startTime, this.getTime(), this.state.minute)
+            this.postRecord(this.props.userId, this.props.words.id, this.state.startTime, this.getTime(), this.state.minute)
             await this.waiting(1000);
-            this.setState({takingTest: false})
             if(this.state.learnMode == "sequence"){
                 this.sequence()
             }
@@ -94,7 +90,8 @@ export default class User extends React.Component {
                 this.random()
             }
             this.setState({answer: "", second: 0, minute: 0})
-            console.log("waitinng")
+            await this.waiting(1000);
+            this.setState({takingTest: false})
         }
         else{
             document.getElementById("wrong-answer").innerHTML = "Wrong answer"
@@ -102,62 +99,30 @@ export default class User extends React.Component {
         }
     }
 
-    getAnswers(word, randomInt){
-        var answerIndex = []
-        while (answerIndex.length != 10) {
-            var random_nb = Math.floor(Math.random() * 10000);
-            if(random_nb != randomInt){
-                answerIndex.push(random_nb)
-            }
-        }
-        console.log("answerIndex")
-        console.log(answerIndex)
-
-        var answers = []
-        var indexOf_correctAnswer = Math.floor(Math.random() * 4);
-        var i = 0
-        for (let index = 0; index < 4; index++) {
-            if(index == indexOf_correctAnswer){
-                answers.push(word.vietnamese)
-                continue
-            }
-            var current_word = this.props.allWords[answerIndex[index]]
-            console.log(index)
-            console.log(answerIndex[index])
-            console.log(current_word)
-            answers.push(this.props.allWords[answerIndex[index]].vietnamese)
-            i = i +1
-        }
-        this.props.dispatch({ type: "GET_ANSWERS", payload: answers })
-            
-        
-
-        // for (let index = 0; index < answerIndex.length; index++) {
-        //     answers.push(this.props.allWords[answerIndex[index]].vietnamese)
-        // }
-        // this.props.dispatch({ type: "GET_ANSWERS", payload: answers })
-
-        // fetch(`https://www.englishmaster.icu:9000/get_wrongAnswers/${word.word}`)
-        //     .then(res => res.json())
-        //     .then(wrongAnswers =>{
-        //         var answers = []
-        //         var indexOf_correctAnswer = Math.floor(Math.random() * 4);
+    getAnswers(word){
+        console.log(word)
+        fetch(`https://www.englishmaster.icu:9000/get_wrongAnswers/${word.word}`)
+            .then(res => res.json())
+            .then(wrongAnswers =>{
+                var answers = []
+                var indexOf_correctAnswer = Math.floor(Math.random() * 4);
                 
-        //         var i = 0
-        //         for (let index = 0; index < 4; index++) {
-        //             if(index == indexOf_correctAnswer){
-        //                 console.log(indexOf_correctAnswer)
-        //                 console.log(word.vietnamese)
-        //                 answers.push(word.vietnamese)
-        //                 continue
-        //             }
-        //             console.log(wrongAnswers[i].vietnamese)
-        //             answers.push(wrongAnswers[i].vietnamese)
-        //             i = i +1
-        //         }
-        //         this.props.dispatch({ type: "GET_ANSWERS", payload: answers })
-        //     }
-        // );
+                var i = 0
+                for (let index = 0; index < 4; index++) {
+                    if(index == indexOf_correctAnswer){
+                        console.log(indexOf_correctAnswer)
+                        console.log(word.vietnamese)
+                        answers.push(word.vietnamese)
+                        continue
+                    }
+                    console.log(wrongAnswers[i].vietnamese)
+                    answers.push(wrongAnswers[i].vietnamese)
+                    i = i +1
+                }
+                this.props.dispatch({ type: "GET_ANSWERS", payload: answers })
+            }
+                
+            );
     }
 
      sequence(){
@@ -166,27 +131,21 @@ export default class User extends React.Component {
             .then(word =>{
                 console.log(word[0])
                 this.props.dispatch({ type: "GET_USER_WORDS", payload: word[0] })
-                // this.getAnswers(word[0])
+                this.getAnswers(word[0])
             } 
-        );
-        lastestIndex += 1
-        this.props.dispatch({ type: "GET_USER_WORDS", payload: this.props.allWords[lastestIndex] })
-        this.getAnswers(this.props.allWords[lastestIndex], lastestIndex)
+            );
     }
 
 
 
      random(){
-        // fetch(`https://www.englishmaster.icu:9000/get_${this.state.difficulty}_randomWord/${this.props.userId}`)
-        //     .then(res => res.json())
-        //     .then(word =>{
-        //         this.props.dispatch({ type: "GET_USER_WORDS", payload: word[0] })
-        //         this.getAnswers(word[0])
-        //     }
-        //     );
-        var randomInt = Math.floor(Math.random() * 10000);
-        this.props.dispatch({ type: "GET_USER_WORDS", payload: this.props.allWords[randomInt] })
-        this.getAnswers(this.props.allWords[randomInt], randomInt)
+        fetch(`https://www.englishmaster.icu:9000/get_${this.state.difficulty}_randomWord/${this.props.userId}`)
+            .then(res => res.json())
+            .then(word =>{
+                this.props.dispatch({ type: "GET_USER_WORDS", payload: word[0] })
+                this.getAnswers(word[0])
+            }
+            );
     }
 
     waiting(ms) {
@@ -222,13 +181,15 @@ export default class User extends React.Component {
         return (
             <div>
                 <div class="jumbotron">
-                    <h4>Hello, are you ready to learn new words?</h4> <br />
+                    <h4>Hello {this.props.username}, are you ready to learn new words?</h4> <br />
                     {this.state.difficulty == ""?
                     <div>
                     <h3>Select Level:</h3>
                     <button onClick={this.selectLevel.bind(this)} value="easy">Easy</button>
                     <button onClick={this.selectLevel.bind(this)} value="normal">Normal </button>
                     <button onClick={this.selectLevel.bind(this)} value="difficult">Difficult </button>
+                    
+
                 </div>
                 :
                 <div>
@@ -238,6 +199,8 @@ export default class User extends React.Component {
 
                 </div>
                 }
+
+                    
                 </div>
             </div>
         )
@@ -253,7 +216,7 @@ export default class User extends React.Component {
 
                     <div className="card">
                         <div class="card-header">
-                            <h4 class="text-center guessing-word">{this.props.words.word}</h4> </div>
+                            <h4 class="text-center guessing-word">{this.state.guessing_Word.word}</h4> </div>
 
                         <div class="card-body">
                             <div class="answ btn-group-vertical" onClick={this.handleClick.bind(this)}>
